@@ -34,7 +34,7 @@ END ARCHITECTURE fdd_decoder;
 --         S <= tmp;
 --     end process;
 
-
+-- Description comportementale non séquentielle
 --     process(input)
 --     begin
 --         S <= (others => '0');
@@ -66,3 +66,6 @@ END ARCHITECTURE fdd_decoder;
 --                         output(i) <= input(sel, i);
 --              END GENERATE gen;
 -- END behavioral;
+
+
+-- Registre parrallèle on lit les 32 bit en meme temps, inverse du registre a décalage
