@@ -22,8 +22,17 @@ BEGIN
     for i in output'range generate 
         S(i) <= '1' when i = unsigned(input) else '0';
     end generate GEN_DEC;
-
 END ARCHITECTURE fdd_decoder;
+
+ARCHITECTURE comp_decoder OF decoder IS
+BEGIN
+    process(input)
+    begin
+        output <= (others => '0');
+        output(to_integer(unsigned(input))) <= '1';
+    end process;
+END ARCHITECTURE comp_decoder;
+
 --------   Description comportementale ---------
 --     output <= S;
 --     process(input)
@@ -34,38 +43,13 @@ END ARCHITECTURE fdd_decoder;
 --         S <= tmp;
 --     end process;
 
--- Description comportementale non séquentielle
+-- Description comportementale non séquentielle ?
 --     process(input)
 --     begin
 --         S <= (others => '0');
 --         S(to_integer(unsigned(input))) <= '1';
 --     end process;
 
-
--- mux generic 
--- LIBRARY IEEE;
--- USE IEEE.STD_LOGIC_1164.ALL;
--- USE work.my_data_types.all;
--- -------------------------------------------------------------------------------------------------------------
--- ENTITY generic_mux IS
--- GENERIC (  inputs: INTEGER := 16;                     -- number of inputs
---                        size : INTEGER := 8);                         -- size of each input
--- 
--- PORT  (        input  :  IN MATRIX (0 TO inputs-1, size-1 DOWNTO 0);
---                       sel      :  IN INTEGER RANGE 0 TO inputs-1;
---                       output : OUT STD_LOGIC_VECTOR (size-1 DOWNTO 0));
--- 
---  
--- 
--- END generic_mux;
--- 
--- -------------------------------------------------------------------------------------------------------------
--- ARCHITECTURE behavioral OF generic_mux IS
--- BEGIN
---               gen: FOR i IN size-1 DOWNTO 0 GENERATE
---                         output(i) <= input(sel, i);
---              END GENERATE gen;
--- END behavioral;
 
 
 -- Registre parrallèle on lit les 32 bit en meme temps, inverse du registre a décalage
