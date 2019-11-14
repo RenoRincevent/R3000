@@ -71,9 +71,13 @@ begin
         p2(i) <= p0(i) and p1;
     end generate GEN_P2;
 
+    reg_inst0 : parallel_register --le data_in de R0 doit valoir zero
+        port map ( data_in => (others => '0'),
+            wr => p2(0),
+            data_out => p3(0));
     GEN_REG:
-    for i in 0 to 31 generate
-        reg_inst : parallel_register --le data_in de R0 doit valoir zero
+    for i in 1 to 31 generate
+        reg_inst : parallel_register
             port map ( data_in => data_in,
                 wr => p2(i),
                 data_out => p3(i));
