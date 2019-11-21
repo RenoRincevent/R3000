@@ -2,8 +2,8 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 --USE IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_arith.all;
-library work;
-use work.bus_mux_pkg.all;
+LIBRARY CombinationalTools;
+USE CombinationalTools.bus_mux_pkg.ALL;
 
 Entity test Is 
 End Entity;
@@ -15,7 +15,7 @@ Architecture arc Of test Is
     Signal sel_input : std_logic_vector(mux_size-1 downto 0);
     Signal output : std_logic_vector(mux_width-1 downto 0);
 begin
-    inst_mux_fdd : Entity Work.multiplexor(fdd_mux) generic Map(mux_size, mux_width) Port Map (input, sel_input,output);
+    inst_mux_fdd : Entity CombinationalTools.multiplexor(fdd_mux) generic Map(mux_size, mux_width) Port Map (input, sel_input,output);
     process
     begin
         -- Initialisation du tableau de vecteur, on met des valeur au pif pour les différentier

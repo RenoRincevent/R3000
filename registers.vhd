@@ -1,8 +1,10 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
-library work;
-use work.bus_mux_pkg.all;
+LIBRARY CombinationalTools;
+USE CombinationalTools.bus_mux_pkg.ALL;
+LIBRARY SequentialTools;
+USE SequentialTools.ALL;
 
 ENTITY RegisterBank IS
 	PORT
@@ -61,7 +63,7 @@ architecture struct_reg of RegisterBank Is
     Signal p3 : bus_mux_array(31 downto 0)(31 downto 0); --Fait le lien entre les sortie des registres et les deux mux
 begin
 
-    decoder_inst : decoder
+    decoder_inst : entity CombinationalTools.decoder
         port map ( input => destination_register,
             output => p0);
     p1 <= clk and write_register;
@@ -71,26 +73,26 @@ begin
         p2(i) <= p0(i) and p1;
     end generate GEN_P2;
 
-    reg_inst0 : parallel_register --le data_in de R0 doit valoir zero
+    reg_inst0 : entity SequentialTools.parallel_register --le data_in de R0 doit valoir zero
         port map ( data_in => (others => '0'),
             wr => p2(0),
             data_out => p3(0));
     GEN_REG:
     for i in 1 to 31 generate
-        reg_inst : parallel_register
+        reg_inst : entity SequentialTools.parallel_register
             port map ( data_in => data_in,
                 wr => p2(i),
                 data_out => p3(i));
     end generate GEN_REG;
     
 -- le mux qui se charge de la sortie data_out_0    
-    multiplexor_inst0 : multiplexor
+    multiplexor_inst0 : entity CombinationalTools.multiplexor
         port map ( input => p3,
             output => data_out_0,
             sel_input => source_register_0);
 
 -- le mux qui se charge de la sortie data_out_1
-    multiplexor_inst1 : multiplexor
+    multiplexor_inst1 : entity CombinationalTools.multiplexor
         port map ( input => p3,
             output => data_out_1,
             sel_input => source_register_1);

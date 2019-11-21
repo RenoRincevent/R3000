@@ -15,7 +15,7 @@ use work.bus_mux_pkg.all;
 Entity multiplexor Is 
     generic
     (
-        mux_size : Integer := 2;
+        mux_size : Integer := 5;
         mux_width : Integer := 32
     );
     Port

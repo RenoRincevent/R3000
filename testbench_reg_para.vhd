@@ -2,6 +2,8 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_arith.all;
+Library SequentialTools;
+Use SequentialTools.ALL;
 
 ENTITY test IS
 END ENTITY;
@@ -12,7 +14,7 @@ Architecture arc of test is
     Signal data_in : Std_logic_vector(register_size-1 downto 0) := (others => '0');
     Signal data_out : Std_logic_vector(register_size-1 downto 0) := (others => '0');
 begin
-    inst_reg_para : entity work.parallel_register(comp_reg_para) generic Map (register_size) Port Map(wr,data_in,data_out);
+    inst_reg_para : entity SequentialTools.parallel_register(comp_reg_para) generic Map (register_size) Port Map(wr,data_in,data_out);
     Process
     begin
         for i in 0 to register_size-1 loop

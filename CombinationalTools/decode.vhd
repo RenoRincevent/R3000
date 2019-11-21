@@ -5,7 +5,7 @@ USE IEEE.NUMERIC_STD.ALL;
 ENTITY decoder IS
     GENERIC
     (
-        dec_size : INTEGER := 3
+        dec_size : INTEGER := 5
     );
     PORT 
     (
