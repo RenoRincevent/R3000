@@ -37,5 +37,13 @@ b_shifter:
 	ghdl -e --std=08 --ieee=synopsys test
 	ghdl -r test --vcd=test.vcd
 	
+alu:
+	rm -f *.o *.vcd *.cf
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/decode.vhd
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/mux.vhd
+	ghdl -a --std=08 --work=SequentialTools SequentialTools/reg_para.vhd
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/b_shifter.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 alu.vhd
+	
 clean:
 	rm -f *.o *.vcd *.cf
