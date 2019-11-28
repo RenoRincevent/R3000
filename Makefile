@@ -29,5 +29,13 @@ registers:
 	ghdl -e --std=08 --ieee=synopsys test
 	ghdl -r test --vcd=test.vcd
 	
+b_shifter:
+	rm -f *.o *.vcd *.cf
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/mux.vhd
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/b_shifter.vhd
+	ghdl -a -PCombinationalTools --std=08 --ieee=synopsys testbench_bshifter.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
+	
 clean:
 	rm -f *.o *.vcd *.cf
