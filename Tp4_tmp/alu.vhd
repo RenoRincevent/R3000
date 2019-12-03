@@ -76,13 +76,32 @@ architecture struct_alu of ALU Is
     Signal S_BS : STD_LOGIC_VECTOR(31 DOWNTO 0); -- fait le lien entre la sortie du barrel shifter et le mux
     Signal S_out_mux : std_logic_vector(31 downto 0); -- recupère la sortie du mux pour le brancher ensuite au res et a la bascule D de Z
     Signal S_out_adder : std_logic_vector(31 downto 0); -- signal en sortie de l'additionneur
+
+    --Signaux utilse pour l'add/sub
+    Signal overflow : Std_logic;
+    Signal carry : Std_logic;
+    Signal locala, localb, localsum : signed(32 downto 0);
+    Signal sumout : std_logic_vector(32 downto 0);
+
+    --bit du résultat pour les opération positionnement si inférieur
+    Signal res0 : Std_logic;
 begin
     S_And <= A and B;
     S_Or <= A or B;
     S_Nor <= A nor B;
     S_Xor <= A xor B;
 
-    --TODO add/subb
+    -- add/subb
+    locala <= resize(signed(A), 33);
+    localb <= resize(signed(B), 33);
+    localsum <= locala + localb when sel(3) = '0' else locala - localb;
+    overflow <= '1' when localsum(31) /= localsum(32) else '0';
+    carry <= '1' when localsum(32) /= sel(3) else '0';
+    sumout <= std_logic_vector(localsum);
+    S_out_adder <= sumout(32) & sumout(30 downto 0);
+
+    --Logique pour déterminer le bit du résultat res0 pour les opérations positionnement si inférieur.
+    res0 <= (Enable_V and (S_out_adder(31) xor overflow)) or ((not Enable_V) and carry);
 
     bs_inst : entity CombinationalTools.barrel_shifter
         port map(input => B,
@@ -96,7 +115,7 @@ begin
         port map( input(0) => S_And,
         input(1) => S_Or,
         input(2) => S_out_adder,
-        --input(3) => 31x"0" ?
+        --input(3) => 31x"0" & res0
         input(4) => S_Nor,
         input(5) => S_Xor,
         input(6) => S_BS,
@@ -108,25 +127,25 @@ begin
 
     --Bascule D pour la sortie C
     inst_reg0 : entity SequentialTools.parallel_register
-      port map(wr => CLK
-      --data_in => ?
+      port map(wr => CLK,
+      data_in => carry,
       data_out => C);
 
     --Bascule D pour la sortie V
     inst_reg1 : entity SequentialTools.parallel_register
-      port map(wr => CLK
-      --data_in => ?
+      port map(wr => CLK,
+      data_in => overflow and (not Slt_Slti) and Enable_V,
       data_out => V);
 
     --Bascule D pour la sortie N
     inst_reg2 : entity SequentialTools.parallel_register
-      port map(wr => CLK
-      --data_in => ?
+      port map(wr => CLK,
+      data_in => S_out_adder(31),
       data_out => N);
 
     --Bascule D pour la sortie Z
     inst_reg3 : entity SequentialTools.parallel_register
-      port map(wr => CLK
+      port map(wr => CLK,
       --data_in => '1' when S_out_mux = 0
       data_out => Z);
 End architecture struct_alu;
