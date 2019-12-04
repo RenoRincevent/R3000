@@ -44,6 +44,9 @@ alu:
 	ghdl -a --std=08 --work=SequentialTools SequentialTools/reg_para.vhd
 	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/b_shifter.vhd
 	ghdl -a -PCombinationalTools -PSequentialTools --std=08 alu.vhd
+	ghdl -a -PCombinationalTools --std=08 --ieee=synopsys testbench_alu.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
 	
 clean:
 	rm -f *.o *.vcd *.cf

@@ -27,77 +27,137 @@ ENTITY ALU IS
 END ENTITY ALU;
 
 architecture struct_alu of ALU Is
-    Component multiplexor Is 
-        generic
-        (
-            mux_size : Integer := 4;
-            mux_width : Integer := 32
-        );
-        Port
-        (
-            input : IN bus_mux_array((2**mux_size)-1 downto 0)(mux_width-1 downto 0);
-            sel_input : IN std_logic_vector(mux_size-1 downto 0);
-            output : OUT std_logic_vector(mux_width-1 downto 0)
-        );
+    Component multiplexor Is
+    generic
+    (
+        mux_size : Integer := 3;
+        mux_width : Integer := 32
+    );
+    Port
+    (
+        input : IN bus_mux_array((2**mux_size)-1 downto 0)(mux_width-1 downto 0);
+        sel_input : IN std_logic_vector(mux_size-1 downto 0);
+        output : OUT std_logic_vector(mux_width-1 downto 0)
+    );
     End Component multiplexor;
     Component barrel_shifter Is
-        generic
-        (
-            shift_size : INTEGER := 5;
-            shifter_width : INTEGER := 32
-        );
-        Port
-        (
-            input : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-            shift_amount : IN STD_LOGIC_VECTOR(shift_size-1 DOWNTO 0);
-            LeftRight : IN STD_LOGIC;
-            LogicArith : IN STD_LOGIC;
-            ShiftRotate : IN STD_LOGIC;
-            output : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-        );
+    generic
+    (
+        shift_size : INTEGER := 5;
+        shifter_width : INTEGER := 32
+    );
+    Port
+    (
+        input : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        shift_amount : IN STD_LOGIC_VECTOR(shift_size-1 DOWNTO 0);
+        LeftRight : IN STD_LOGIC;
+        LogicArith : IN STD_LOGIC;
+        ShiftRotate : IN STD_LOGIC;
+        output : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    );
     END Component barrel_shifter;
+    Component parallel_register is
+    Generic
+    (
+        register_size : Integer := 1
+    );
+    Port
+    (
+        wr : In Std_logic;
+        data_in : In Std_logic_vector(register_size-1 downto 0);
+        data_out : Out Std_logic_vector(register_size-1 downto 0)
+    );
+    End Component parallel_register;
     Signal S_And : STD_LOGIC_VECTOR(31 DOWNTO 0); --Ces signaux font le lien entre les opération logique et le mux
     Signal S_Or : STD_LOGIC_VECTOR(31 DOWNTO 0); --
+    Signal S_Nor : STD_LOGIC_VECTOR(31 DOWNTO 0); --
     Signal S_Xor : STD_LOGIC_VECTOR(31 DOWNTO 0); --
-    Signal S_Nand : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    Signal S_Nor : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    Signal S_Xnor : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    Signal S_LR : Std_logic;
+
     Signal S_BS : STD_LOGIC_VECTOR(31 DOWNTO 0); -- fait le lien entre la sortie du barrel shifter et le mux
+    Signal S_out_mux : std_logic_vector(31 downto 0); -- recupère la sortie du mux pour le brancher ensuite au res et a la bascule D de Z
+    Signal S_out_adder : std_logic_vector(31 downto 0); -- signal en sortie de l'additionneur
+
+    --Signaux utilse pour l'add/sub
+    Signal flow : Std_logic;
+    Signal overflow : Std_logic;
+    Signal carry : Std_logic;
+    Signal locala, localb, localsum : signed(32 downto 0);
+    Signal sumout : std_logic_vector(32 downto 0);
+
+    --bit du résultat pour les opération positionnement si inférieur
+    Signal res0 : Std_logic;
+    
+    Signal tmp : Std_logic_vector(30 downto 0) := (others => '0');
+    Signal res0_vec : Std_logic_vector(31 downto 0);
+    Signal ZTmp : Std_logic;
+    
 begin
     S_And <= A and B;
     S_Or <= A or B;
-    S_Xor <= A xor B;
-    S_Nand <= A nand B;
     S_Nor <= A nor B;
-    S_Xnor <= A xnor B;
+    S_Xor <= A xor B;
+    S_LR <= not sel(0);
+
+    -- add/subb
+    locala <= resize(signed(A), 33);
+    localb <= resize(signed(B), 33);
+    localsum <= locala + localb when sel(3) = '0' else locala - localb;
+    flow <= '1' when localsum(31) /= localsum(32) else '0';
+    carry <= '1' when localsum(32) /= sel(3) else '0';
+    sumout <= std_logic_vector(localsum);
+    S_out_adder <= sumout(32) & sumout(30 downto 0);
+
+    --Logique pour déterminer le bit du résultat res0 pour les opérations positionnement si inférieur.
+    res0 <= (Enable_V and (S_out_adder(31) xor overflow)) or ((not Enable_V) and carry);
+    res0_vec <= tmp & res0;
     
     bs_inst : entity CombinationalTools.barrel_shifter
         port map(input => B,
             shift_amount => ValDec,
-            LeftRight => sel(2),
-            LogicArith => sel(1),
-            ShiftRotate => sel(0),
+            LeftRight => S_LR,
+            LogicArith => '0',
+            ShiftRotate => '0',
             output => S_BS);
-    
+
     mux_inst : entity CombinationalTools.multiplexor
+        generic map (  mux_size => 3, mux_width => 32)
         port map( input(0) => S_And,
         input(1) => S_Or,
-        input(2) => S_Xor,
-        input(3) => S_Nand,
+        input(2) => S_out_adder,
+        input(3) => res0_vec,
         input(4) => S_Nor,
-        input(5) => S_Xnor,
-        -- input 6 = add
-        -- input 7 = sub
-        input(8) => S_BS,
-        input(9) => S_BS,
-        input(10) => S_BS,
-        input(11) => S_BS,
-        input(12) => S_BS,
-        input(13) => S_BS,
-        input(14) => S_BS,
-        input(15) => S_BS,
-            output => Res,
-            sel_input => sel);
-            
+        input(5) => S_Xor,
+        input(6) => S_BS,
+        input(7) => S_BS,
+        output => S_out_mux,
+        sel_input => sel(2 downto 0));
+
+    res <= S_out_mux;
+
+    --Bascule D pour la sortie C
+    inst_reg0 : entity SequentialTools.parallel_register
+      port map(wr => CLK,
+      data_in(0) => carry,
+      data_out(0) => C);
+
+    overflow <= flow and (not Slt) and Enable_V;
+    --Bascule D pour la sortie V
+    inst_reg1 : entity SequentialTools.parallel_register
+      port map(wr => CLK,
+      data_in(0) => overflow,
+      data_out(0) => V);
+
+    --Bascule D pour la sortie N
+    inst_reg2 : entity SequentialTools.parallel_register
+      port map(wr => CLK,
+      data_in(0) => S_out_adder(31),
+      data_out(0) => N);
+    
+    ZTmp <= '1' when unsigned(S_out_mux) = 0;
+    --Bascule D pour la sortie Z
+    inst_reg3 : entity SequentialTools.parallel_register
+      port map(wr => CLK,
+      data_in(0) => ZTmp,
+      data_out(0) => Z);
 End architecture struct_alu;
- 
