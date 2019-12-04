@@ -28,22 +28,32 @@ BEGIN
     BEGIN
         A <= conv_std_logic_vector(8,A'length);
         B <= conv_std_logic_vector(2,B'length);
+        Slt <= '0';
         ValDec <= conv_std_logic_vector(1,ValDec'length);
+        Enable_V <= '1';
         FOR I IN 0 to 15 LOOP
             sel <= conv_std_logic_vector(I,sel'length);
             WAIT FOR 5 ns;
             CLK <= '1';
             WAIT FOR 5 ns;
             CLK <= '0';
+            WAIT FOR 5 ns;
         END LOOP;
         
-        --TODO Test de l'overflow et du carry
-        A <= conv_std_logic_vector(2**31 - 1,A'length);
-        B <= conv_std_logic_vector(2**31 - 3,B'length);
-        sel <= conv_std_logic_vector(3,sel'length);
-        CLK <= '1';
-        WAIT FOR 5 ns;
-        CLK <= '0';
+        --test avec des négatifs
+        A <= conv_std_logic_vector(8,A'length);
+        B <= conv_std_logic_vector(-9,B'length);
+        Slt <= '0';
+        ValDec <= conv_std_logic_vector(1,ValDec'length);
+        Enable_V <= '1';
+        FOR I IN 0 to 15 LOOP
+            sel <= conv_std_logic_vector(I,sel'length);
+            WAIT FOR 5 ns;
+            CLK <= '1';
+            WAIT FOR 5 ns;
+            CLK <= '0';
+            WAIT FOR 5 ns;
+        END LOOP;
         WAIT; --pour terminer le test bench
     END PROCESS;
 END ARCHITECTURE;

@@ -137,27 +137,31 @@ begin
 
     --Bascule D pour la sortie C
     inst_reg0 : entity SequentialTools.parallel_register
-      port map(wr => CLK,
-      data_in(0) => carry,
-      data_out(0) => C);
+        generic map (  register_size => 1)
+        port map(wr => CLK,
+        data_in(0) => carry,
+        data_out(0) => C);
 
     overflow <= flow and (not Slt) and Enable_V;
     --Bascule D pour la sortie V
     inst_reg1 : entity SequentialTools.parallel_register
-      port map(wr => CLK,
-      data_in(0) => overflow,
-      data_out(0) => V);
+        generic map (  register_size => 1)
+        port map(wr => CLK,
+        data_in(0) => overflow,
+        data_out(0) => V);
 
     --Bascule D pour la sortie N
     inst_reg2 : entity SequentialTools.parallel_register
-      port map(wr => CLK,
-      data_in(0) => S_out_adder(31),
-      data_out(0) => N);
+        generic map (  register_size => 1)
+        port map(wr => CLK,
+        data_in(0) => S_out_adder(31),
+        data_out(0) => N);
     
-    ZTmp <= '1' when unsigned(S_out_mux) = 0;
+    ZTmp <= '1' when unsigned(S_out_mux) = 0 else '0';
     --Bascule D pour la sortie Z
     inst_reg3 : entity SequentialTools.parallel_register
-      port map(wr => CLK,
-      data_in(0) => ZTmp,
-      data_out(0) => Z);
+        generic map (  register_size => 1)
+        port map(wr => CLK,
+        data_in(0) => ZTmp,
+        data_out(0) => Z);
 End architecture struct_alu;
