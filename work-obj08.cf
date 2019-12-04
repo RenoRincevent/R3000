@@ -1,7 +1,0 @@
-v 4
-file . "testbench_alu.vhd" "ba4f0c52a079b22914177f43389bfe987cc1eb35" "20191204105946.457":
-  entity test at 1( 0) + 0 on 13;
-  architecture arc of test at 11( 196) + 0 on 14;
-file . "alu.vhd" "4f5458ea95ef7aa331e62024afe3267b473f032a" "20191204105946.166":
-  entity alu at 1( 0) + 0 on 11;
-  architecture struct_alu of alu at 29( 596) + 0 on 12;
