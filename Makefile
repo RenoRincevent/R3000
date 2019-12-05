@@ -33,6 +33,20 @@ cpMux:
 	ghdl -e --std=08 --ieee=synopsys test
 	ghdl -r test --vcd=test.vcd
 	
+extension:
+	make components
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 extension.vhd
+	ghdl -a --std=08 --ieee=synopsys testbench_extension.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
+	
+adder:
+	make components
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 adder.vhd
+	ghdl -a --std=08 --ieee=synopsys testbench_adder.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
+	
 components:
 	rm -f *.o *.vcd *.cf
 	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/decode.vhd

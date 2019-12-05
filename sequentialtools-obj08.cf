@@ -1,0 +1,4 @@
+v 4
+file . "SequentialTools/reg_para.vhd" "87c42574a24a65053244999e083f3ec6ff254cec" "20191205162409.813":
+  entity parallel_register at 1( 0) + 0 on 11;
+  architecture comp_reg_para of parallel_register at 18( 372) + 0 on 12;
