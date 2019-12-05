@@ -27,9 +27,9 @@ Architecture arc of test is
     Signal EcrireReg : STD_LOGIC;
     Signal RegDst : STD_LOGIC_VECTOR(1 DOWNTO 0);
     Signal OpExt : STD_LOGIC;
-    Signal MemVersReg : STD_LOGIC_VECTOR(1 DOWNTO 0)
+    Signal MemVersReg : STD_LOGIC_VECTOR(1 DOWNTO 0);
 begin
-    inst_regs : entity work.InstructionDecoder(fdd_inst_decoder) Port Map(code_op,Saut,EcrireMem_W,EcrireMem_H,EcrireMem_B,
+    inst_dec : entity work.InstructionDecoder(fdd_inst_decoder) Port Map(code_op,Saut,EcrireMem_W,EcrireMem_H,EcrireMem_B,
     LireMem_W,LireMem_UH,LireMem_UB,LireMem_SH,LireMem_SB,
     B_ltz_ltzAl_gez_gezAl,
     B_gtz,B_lez,B_ne,B_eq,

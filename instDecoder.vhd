@@ -48,6 +48,7 @@ architecture fdd_inst_decoder of InstructionDecoder Is
   Signal m : STD_LOGIC_VECTOR(63 DOWNTO 0); --minterms à la sortie du decodeur
   begin
     decoder_inst : entity CombinationalTools.decoder
+    generic map (  dec_size => 6)
       port map ( input => code_op,
       output => m);
 
@@ -77,4 +78,4 @@ architecture fdd_inst_decoder of InstructionDecoder Is
     UALOp(1) <= m(0) or m(8) or m(9) or m(10) or m(11) or m(12) or m(13) or m(14) or m(15);
     UALOp(0) <= m(1) or m(4) or m(5) or m(6) or m(7) or m(8) or m(9) or m(10) or m(11) or m(12) or m(13) or m(14) or m(15);
 
-end architecture fdd_inst_decoder;
+end architecture fdd_inst_decoder; 
