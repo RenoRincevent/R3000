@@ -47,6 +47,13 @@ adder:
 	ghdl -e --std=08 --ieee=synopsys test
 	ghdl -r test --vcd=test.vcd
 	
+sram:
+	make components
+	ghdl -a  --std=08 --work=SequentialTools SequentialTools/sram.vhd
+	ghdl -a -PSequentialTools --std=08 --ieee=synopsys testbench_sram.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
+	
 components:
 	rm -f *.o *.vcd *.cf
 	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/decode.vhd
