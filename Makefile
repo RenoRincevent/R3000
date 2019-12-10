@@ -68,9 +68,9 @@ r3000:
 	ghdl -a -PCombinationalTools -PSequentialTools --std=08 CPMux.vhd
 	ghdl -a -PCombinationalTools -PSequentialTools --std=08 extension.vhd
 	ghdl -a -PCombinationalTools -PSequentialTools --std=08 adder.vhd
-	ghdl -a -PCombinationalTools -PSequentialTools --std=08 --ieee=synopsys R3000.vhd
-	ghdl -a -PCombinationalTools -PSequentialTools --std=08 --ieee=synopsys testbench_r3000.vhd
-	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 R3000.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 testbench_r3000.vhd
+	ghdl -e --std=08 test
 	ghdl -r test --vcd=test.vcd
 	
 components:

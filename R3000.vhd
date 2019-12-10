@@ -1,7 +1,6 @@
 -- Standard libraries
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.STD_LOGIC_MISC.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 -- User-defined libraries
 LIBRARY CombinationalTools;
@@ -81,7 +80,7 @@ Architecture struct_r3000 of R3000 Is
     Signal BSrc : Std_logic_vector(31 downto 0);
     
     --Signal du CP
-    Signal CP : Std_logic_vector(31 downto 0) := (others => '0');
+    Signal CP : Std_logic_vector(31 downto 0) := "10111111110000000000000000000000";
     
     --Signal de sortie de l'adder cp+4 et de l'adder de l'extension
     Signal Out_add_CP4 : Std_logic_vector(31 downto 0);
@@ -90,7 +89,6 @@ Architecture struct_r3000 of R3000 Is
     --Signal de la mémoire de données
     Signal Out_MD : Std_logic_vector(31 downto 0);
 begin
-    --Done
     inst_mux_MemversReg : entity CombinationalTools.multiplexor
         generic map (  mux_size => 2, mux_width => 32)
         port map(input(0) => Res, 
@@ -99,8 +97,7 @@ begin
         input(3) => (others =>'Z'),
         sel_input => MemversReg, --le selecteur est connecté a la sortie MemversReg du controle
         output => DWrite); --la sortie est connecté a la donnée a écrire dans le banc de registre
-    
-    --Done
+
     inst_mux_RegDest : entity CombinationalTools.multiplexor
         generic map (  mux_size => 2, mux_width => 5)
         port map(input(0) => Instruction(20 downto 16), 
@@ -109,8 +106,7 @@ begin
         input(3) => (others =>'Z'),
         sel_input => RegDest, --le selecteur est connecté a la sortie RegDest du controle
         output => RWrite); --la sortie est connecté au registre destination dans le banc de registres
-    
-    --Done
+
     Input2_UALS_mux <= (others => '0');
     Input3_UALS_mux(31 downto 16) <= Instruction(15 downto 0);
     Input3_UALS_mux(15 downto 0) <= (others => '0');
@@ -122,8 +118,7 @@ begin
         input(3) => Input3_UALS_mux,
         sel_input => UALSrc, --le selecteur est connecté a la sortie UALSrc du controle
         output => BSrc); --la sortie est connecté au registre B de l'UAL
-    
-    --Done
+
     inst_mux_CPSrc : entity CombinationalTools.multiplexor
         generic map (  mux_size => 1, mux_width => 32)
         port map(input(0) => Out_add_CP4, 
@@ -131,7 +126,6 @@ begin
         sel_input(0) => CPSrc, --le selecteur est connecté a la sortie CPSrc du controle MUX
         output => CPMux_out); --la sortie est connecté a l'entrée 1 du mux saut
     
-    --Done    
     Input1_Saut_mux <= CP(31 downto 28) & Instruction(25 downto 0) & "00";
     inst_mux_Saut : entity CombinationalTools.multiplexor
         generic map (  mux_size => 2, mux_width => 32)
@@ -142,8 +136,7 @@ begin
         sel_input => Saut, --le selecteur est connecté a la sortie Saut du controle
         output => SautMux_out);
     CP <= SautMux_out;
-    
-    --Done
+
     inst_RegisterBank : entity work.RegisterBank
         port map (source_register_0 => Instruction(25 downto 21),
         data_out_0 => DRead0,
@@ -154,13 +147,11 @@ begin
         write_register => EcrireReg,
         clk => CLK);
     
-    --Done    
     inst_extension : entity work.Extension
         port map (OpExt => OpExt,
         inst => Instruction(15 downto 0),
         output => Ext);
-    
-    --Done
+
     inst_controle : entity work.InstructionDecoder
         port map(Instruction(31 downto 26),
         Saut,
@@ -168,8 +159,7 @@ begin
         LireMem_W,LireMem_UH,LireMem_UB,LireMem_SH,LireMem_SB,
         B_ltz_ltzAl_gez_gezAl,B_gtz,B_lez,B_ne,B_eq,
         UALOp,UALSrc,EcrireReg,RegDest,OpExt,MemVersReg);
-        
-    --Done
+
     inst_controle_UAL : entity work.UALControler
         port map(op => Instruction(31 downto 26),
         f => Instruction(5 DOWNTO 0),
@@ -177,8 +167,7 @@ begin
         Enable_V => Out_controle_UAL(0),
         Slt_Slti => Out_controle_UAL(1),
         Sel => Out_controle_UAL(5 downto 2));
-    
-    --Done
+
     inst_UAL : entity work.ALU
     port map(A => DRead0,
         B => BSrc,
@@ -201,10 +190,9 @@ begin
         B_eq => B_eq,
         N => N,
         Z => Z,
-        rt0 => '0', --What the fuk is that ?
+        rt0 => '0', --What is that 'rt0'?
         CPSrc => CPSrc);
-    
-    --Done
+
     inst_CP_Plus_4 : entity work.adder
         generic map(32)
         port map(op_0 => CP,
@@ -212,15 +200,13 @@ begin
         op_1(3 downto 0) => "0100",
         sum => Out_add_CP4);
     
-    --Done    
     inst_adder_extension : entity work.adder
         generic map(32)
         port map(op_0 => Out_add_CP4,
         op_1(31 downto 2) => Ext(29 downto 0),
         op_1(1 downto 0) => "00",
         sum => Out_add_ext);
-    
-    --Done
+
     IMem_Abus <= CP;
     inst_memoire_instructions : entity SequentialTools.SRAM_DPS
         generic map(address_width => 16,data_bus_width => 32)
@@ -231,14 +217,13 @@ begin
         CS => '0',
         OE => '0',
         CLK => CLK);
-    
-    --Done
+
     DMem_Abus <= Res;
     DMem_Dbus <= DRead1;
     inst_memoire_donnees : entity SequentialTools.SRAM_DPS
         generic map(address_width => 16,data_bus_width => 32)
         port map(address => Res(15 downto 0),
-        data_in => DMem_Dbus,
+        data_in => DRead1,
         data_out => Out_MD,
         WE => DMem_WR,
         CS => '0',
