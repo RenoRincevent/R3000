@@ -54,6 +54,25 @@ sram:
 	ghdl -e --std=08 --ieee=synopsys test
 	ghdl -r test --vcd=test.vcd
 	
+r3000:
+	rm -f *.o *.vcd *.cf
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/decode.vhd
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/mux.vhd
+	ghdl -a --std=08 --work=SequentialTools SequentialTools/reg_para.vhd
+	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/b_shifter.vhd
+	ghdl -a  --std=08 --work=SequentialTools SequentialTools/sram.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 registers.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 alu.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 instDecoder.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 ualControler.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 CPMux.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 extension.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 adder.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 --ieee=synopsys R3000.vhd
+	ghdl -a -PCombinationalTools -PSequentialTools --std=08 --ieee=synopsys testbench_r3000.vhd
+	ghdl -e --std=08 --ieee=synopsys test
+	ghdl -r test --vcd=test.vcd
+	
 components:
 	rm -f *.o *.vcd *.cf
 	ghdl -a --std=08 --work=CombinationalTools CombinationalTools/decode.vhd

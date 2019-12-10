@@ -16,7 +16,7 @@ ENTITY SRAM_DPS IS
 END ENTITY SRAM_DPS; 
 
 Architecture comp_Sram of SRAM_DPS Is 
-    type ram is array (0 to (2**address_width)-1) of std_logic_vector(data_bus_width-1 downto 0); --256 octets
+    type ram is array (0 to (2**address_width)-1) of std_logic_vector(data_bus_width-1 downto 0);
     signal blockRam : ram := (others => (others => '0'));
 begin
     process(CS,WE,OE,CLK) 

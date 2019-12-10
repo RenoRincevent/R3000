@@ -20,7 +20,7 @@ begin
     PROCESS 
     BEGIN
         address <= conv_std_logic_vector(1,address'length);
-        data_in <= conv_std_logic_vector(4,address'length);
+        data_in <= conv_std_logic_vector(4,data_in'length);
         CLK <= '0';
         CS <= '1'; --sortie à haute impédance
         wait for 5 ns;
